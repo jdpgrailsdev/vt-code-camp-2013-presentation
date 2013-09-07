@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1024" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>VT Code Camp 2013 | Centralized Application Configuration with Apache ZooKeeper</title>
+
+    <meta name="description" content="Presentation for VT Code Camp 2013 on Centralized Application Configuration via Apache ZooKeeper" />
+    <meta name="author" content="Jonathan Pearlin" />
+
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:700,400' rel='stylesheet' type='text/css'>
+    <link href="css/impress.css" rel="stylesheet" />
+    <link href="css/impressConsole.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="images/favicon.ico" />
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+</head>
+<body class="impress-not-supported">
+    <div class="fallback-message">
+        <p>Your browser <b>doesn't support the features required</b> by impress.js, so you are presented with a simplified version of this presentation.</p>
+        <p>For the best experience please use the latest <b>Chrome</b>, <b>Safari</b> or <b>Firefox</b> browser.</p>
+    </div>
+    <div id="impress">
+        <div id="start" class="step">
+            <h1>Centralized Configuration with Apache ZooKeeper</h1>
+            <div style="position:absolute;border:0;width:100%;margin-top:200px;">
+                <div style="float:right;text-align:right;font-family:Droid Sans;font-size:20px;color:white">
+                    <div>Jonathan Pearlin</div>
+                    <div>Technical Lead</div>
+                    <div>
+                        <img src='images/ddclogo.png' style="width:40%;height:40%"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="step2" class="step slide">
+            <h3>about me</h3>
+            <div>
+                <ul>
+                    <li>Technical Lead @ Dealer.com</li>
+                    <li>10+ years of Java development experience</li>
+                    <li>Contributor to the Grails Framework</li>
+                    <li>Lived in MA, VA, CA and VT</li>
+                </ul>
+                <img style="float:right;" src="images/robot_devil.png" />
+            </div>
+        </div>
+        <div id="step3" class="step slide">
+            <img style="width:100%;height:100%" src="images/doc_brown.png" />
+            <div class="notes">
+                <ul>
+                    <li>If only this were true...</li>
+                    <li>Configuration is a necessity of non-trivial applications and mature software development life-cycles.</li>
+                    <li>The more complex the system or the more complex the environment, the more critical configuration becomes.</li>
+                    <li>However, despite being critical to the success of software development, there are problems related to implementing application configuration.</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step4" class="step slide">
+            <h3>the problem</h3>
+            <div>
+                <span>I want to configure my application</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>I think that we can all relate to this problem</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step5" class="step slide">
+            <h3>the problem</h3>
+            <div>
+                <span>I want to make configuration changes to my application without re-deploying</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>I should be able to make a configuration change and either restart my application or have it pick it up at runtime</li>
+                    <li>Things can go wrong if I need to re-build and re-deploy just for a configuration change</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step6" class="step slide">
+            <h3>the problem</h3>
+            <div>
+                <span>I want to be able to spin up a new instance of an application without having to duplicate its configuration</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>I should be able to spin up a new VM and install my application without worrying about making sure I got the configuration right for the target environment
+                        <ul>
+                            <li>Let it find its configuration based on some identification parameters</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="step7" class="step slide">
+            <h3>the problem</h3>
+            <div>
+                <span>I want configuration consistency between application instances and different applications</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Avoid copy and paste mistakes</li>
+                    <li>Avoid issues where two different apps that should be using the same configuration do not due to miscommunication/mistakes</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step8" class="step slide">
+            <h3>the problem</h3>
+            <div>
+                <span>I want to avoid plain-text passwords in my configuration files</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Because friends don’t let friends store plain-text passwords in configuration files checked into source control.</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step9" class="step slide">
+            <h3>the solution</h3>
+            <div>
+                <span>centralized, hierarchical configuration management organized by environment, data center and application</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Configuration stored in one, centralized location
+                        <ul>
+                            <li>No longer stored in each application’s source repository</li>
+                        </ul>
+                    </li>
+                    <li>Configuration layered in a hierarchical fashion to allow for overrides of values in specific cases</li>
+                    <li>Hierarchy is based on environment, data center and/or application identification criteria (name, host, port, version)</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step10" class="step slide">
+            <h3>the solution</h3>
+            <img src="images/solution.png" />
+            <div class="notes">
+                <ul>
+                    <li>Store configuration in a centralize location accessible by all applications</li>
+                    <li>Apache ZooKeeper provides us with both a centralized service AND hierarchical data storage</li>
+                    <li>Before we dig into the solution in more details, lets first get a brief overview of Apache ZooKeeper and some of the tooling around it</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step11" class="step slide">
+            <h3>Apache ZooKeeper</h3>
+            <div>
+                <span>“ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.” <sup>1</sup></span>
+            </div>
+            <img src="images/zookeeper_small.gif" style="display:block;margin-left:auto;margin-right:auto;margin-top:50px;width:25%;height:25%" />
+            <div class="footer">
+                <div>
+                    <sup>1</sup> http://zookeeper.apache.org
+                </div>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>An open-source server which enables highly reliable distributed coordination</li>
+                    <li>Originally created to provide orchestration between Apache Hadoop instances</li>
+                    <li>Grown to focus on providing the items listed in the definition for any distributed system</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step12" class="step slide">
+            <h3>Apache ZooKeeper</h3>
+            <div>
+                <span>replicated servers that are organized into an “ensemble”</span>
+                <img src="images/zkservice.jpg" style="display:block;margin-left:auto;margin-right:auto;margin-top:50px;" /><sup style="float:right">1</sup>
+            </div>
+            <div class="footer">
+                <div>
+                    <sup>1</sup> http://zookeeper.apache.org/doc/trunk/zookeeperOver.html#sc_designGoals
+                </div>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>The ensemble maintains an in-memory image of state</li>
+                    <li>Transaction logs and snapshots of data are persisted to disk </li>
+                    <li>The ensemble uses an election algorithm to anoint a leader
+                        <ul>
+                            <li>Leader is responsible for handling all “write” requests</li>
+                            <li>Recommended that you have at least 5 members in the ensemble</li>
+                        </ul>
+                    </li>
+                    <li>Clients can connect to any member of the ensemble
+                        <ul>
+                            <li>Writes are routed to the “leader” </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="step13" class="step slide">
+            <h3>Apache ZooKeeper</h3>
+            <div>
+                <span>data model uses hierarchical name spacing</span>
+                <img src="images/zknamespace.jpg" style="display:block;margin-left:auto;margin-right:auto;margin-top:50px;" /><sup style="clear:right;vertical-align:top">1</sup>
+            </div>
+            <div class="footer">
+                <div>
+                    <sup>1</sup> http://zookeeper.apache.org/doc/trunk/zookeeperOver.html#sc_dataModelNameSpace
+                </div>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Nodes are called “znodes”</li>
+                    <li>Similar to a traditional file system
+                        <ul>
+                            <li>Key difference is that a node can be both a file and a directory (i.e. byte data can be stored at any node, even if it has sub-nodes)</li>
+                            <li>ZK also keeps metadata about each node, called “statistics” (created timestamp, edited timestamp, version, etc)</li>
+                        </ul>
+                    </li>
+                    <li>Data is kept in-memory
+                        <ul>
+                            <li>This is how ZK achieves high throughput and low latency numbers</li>
+                        </ul>
+                    </li>
+                    <li>Changes to nodes can be “watched”, which allows for your application to be notified when data changes at a certain path.</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step14" class="step slide">
+            <h3>Apache ZooKeeper</h3>
+            <div>
+                <span>other guarantees:</span>
+                <ul>
+                    <li>Updates are applied in order</li>
+                    <li>No partial write results</li>
+                    <li>Consistent view of system data within ensemble</li>
+                    <li>Eventual consistency of updates between clients</li>
+                </ul>
+            </div>
+            <div class="notes">
+            </div>
+        </div>
+        <div id="step15" class="step slide">
+            <h3>Apache ZooKeeper</h3>
+            <div>
+                <span>supports the following client authentication schemes “out of the box”:</span>
+                <ul>
+                    <li>Digest</li>
+                    <li>IP (whitelist/blacklist)</li>
+                    <li>SASL</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>“Pluggable” authentication support - can create custom implementations</li>
+                    <li>Enabled via the ZooKeeper configuration file or system properties</li>
+                    <li>Multiple client authentication mechanisms can be enabled (will be applied in order defined by configuration)</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step16" class="step slide">
+            <h3>Apache ZooKeeper</h3>
+            <div>
+                <span>access to znodes can be controlled with applied ACL’s</span>
+                <ul>
+                    <li><strong>CREATE</strong>: you can create a child node</li>
+                    <li><strong>READ</strong>: you can get data from a node and list its children.</li>
+                    <li><strong>WRITE</strong>: you can set data for a node</li>
+                    <li><strong>DELETE</strong>: you can delete a child node</li>
+                    <li><strong>ADMIN</strong>: you can set permissions</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Similar to UNIX file access permissions
+                        <ul>
+                            <li>Key differences:
+                                <ul>
+                                    <li>ACL is not limited by scope, as no one “owns” a znode.  Instead, it is tied to the authenticated user</li>
+                                    <li>ACL’s are not recursive (i.e. it does not apply to any children of the znode -- must be set manually on each child)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>ACL’s can be assigned at the time of creating a znode or at any point afterwards, as long as the authenticated user has “ADMIN” ACL</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step17" class="step slide">
+            <h3>Apache ZooKeeper</h3>
+            <div>
+                <span>ships with Java, C, Perl and Python client bindings</span>
+                <br />
+                <br />
+                <span>information on additional bindings can be found at:  https://cwiki.apache.org/confluence/display/ZOOKEEPER/ZKClientBindings </span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Additional bindings include:
+                        <ul>
+                            <li>Scala</li>
+                            <li>C#</li>
+                            <li>Node.JS</li>
+                            <li>Erlang</li>
+                            <li>Haskell</li>
+                            <li>Ruby</li>
+                            <li>Go</li>
+                            <li>Lua</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="step18" class="step slide">
+            <h3>Apache Curator</h3>
+            <img src="images/curator-logo.png" style="float:right" />
+            <div>
+                <span>the “better” Java ZooKeeper client</span>
+                <ul>
+                    <li>“Fluent”-style syntax:
+                        <code>client.create().forPath(<span class="string">"/head"</span>, <span class="new">new</span> byte[<span class="decimal">0</span>]);</code>
+                        <code>client.delete().inBackground().forPath(<span class="string">"/head"</span>);</code>
+                        <code>client.create().withMode(CreateMode.<span class="new">EPHEMERAL_SEQUENTIAL</span>)</code>
+                        <code>&nbsp;&nbsp;&nbsp;&nbsp;.forPath(<span class="string">"/head/child"</span>, <span class="new">new</span> byte[<span class="decimal">0</span>]);</code>
+                        <code>client.getData().watched().inBackground().forPath(<span class="string">"/test"</span>);</code>
+                    </li>
+                    <br />
+                    <li>http://curator.incubator.apache.org/index.html</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>A “curator” is a keeper or custodian of a museum or other collection (in other words, a zoo keeper’s boss)</li>
+                    <li>Originally created by Netflix, open sourced and given to the Apache Software Foundation to sheppard</li>
+                    <li>Includes “recipes” for common operations/uses of ZooKeeper (i.e. distributed locking, etc)</li>
+                    <li>Much easier to use than the raw Java client driver
+                        <ul>
+                            <li>In practice, we found it much easier to deal with exceptions/errors and to get statistics back from znodes</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="step19" class="step slide">
+            <h3>Exhibitor</h3>
+            <div>
+                <span>a Java-based supervisory system for ZooKeeper that provides:</span>
+                <ul>
+                    <li>current state of a ZooKeeper server instance</li>
+                    <li>periodic backups of data/transactions</li>
+                    <li>periodic cleaning of ZooKeeper logs</li>
+                    <li>UI for exploring znodes</li>
+                    <li>REST API for all of the above</li>
+                </ul>
+                <br />
+                <span>Code available @ https://github.com/Netflix/exhibitor</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Created by Netflix</li>
+                    <li>Web-based UI for managing a ZooKeeper instance
+                        <ul>
+                            <li>Installed on each ZooKeeper server in your ensemble</li>
+                        </ul>
+                    </li>
+                    <li>Can be used to manage the ZooKeeper configuration files pushed to each instance in the ensemble</li>
+                    <li>Verify useful for viewing a read-only copy of the data stored in the znodes</li>
+                </ul>
+            </div>
+        </div>
+        <div id="span20" class="step slide">
+            <h3>Exhibitor</h3>
+            <img src="images/exhibitor.png" style="width:100%;height:100%;"/>
+        </div>
+        <div id="step21" class="step slide">
+            <h3>the solution</h3>
+            <img src="images/solution.png" />
+            <div class="notes">
+                <ul>
+                    <li>Now that we have an overview of ZooKeeper, let’s re-examine the solution</li>
+                    <li>Simple premise:  applications request configuration from the centralized service (ZooKeeper)</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step21" class="step slide">
+            <h3>definitions</h3>
+            <div>
+                <span><span class="definition">con·fig·u·ra·tion</span> - a collection of properties that define a resource used by an application at runtime</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>For instance, the properties that defines the values used by a data source, such as connection url, username, password, etc.</li>
+                    <li>These properties are grouped together to define the configuration of that data source -- no need to look them up one at a time.</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step22" class="step slide">
+            <h3>definitions</h3>
+            <div>
+                <span><span class="definition">bind·ing</span> - an association between an application and a specific configuration</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Multiple applications may consume the same configuration -- no need to duplicate the configuration data</li>
+                    <li>Duplication of data causes mistakes</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step23" class="step slide">
+            <h3>definitions</h3>
+            <div>
+                <span><span class="definition">bind·ing set</span> - the collection of bindings for a given application instance</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>We wanted to make it easier to find all of the configurations used by a particular application</li>
+                    <li>This allows us to document what an application consumes, as well as the reverse -- which applications are impacted when configuration X changes.</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step24" class="step slide">
+            <h3>configuration</h3>
+            <div>
+                <span>stored as JSON documents at each znode in ZooKeeper</span>
+                <ul>
+                    <li>takes advantage of hierarchical nature of ZooKeeper data storage</li>
+                    <li>allows for path-based retrieval of configuration</li>
+                    <li>merging of data stored in nodes done at retrieval/lookup time</li>
+                </ul>
+                <code>{</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;"@type":&nbsp;&nbsp;&nbsp;&nbsp;&lt;POJO class used for serialization to/from JSON&gt;,</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;"@creator":&nbsp;&lt;The creator class type responsible for converting</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;config into object&gt;,</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;"username":&nbsp;&lt;the username&gt;,</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;"password":&nbsp;&lt;the password&gt;,</code>
+                <br />
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;...</code>
+                <br />
+                <code>}</code>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Data stored in each znode may be a full configuration document or partial configuration document</li>
+                    <li>Child nodes “override” parent nodes
+                        <ul>
+                            <li>JSON stored at a child node may include new properties or may re-define a property defined in a parent node</li>
+                            <li>If the property is not defined in the child node, the value is inherited from the parent node</li>
+                        </ul>
+                    </li>
+                    <li>znode paths include the configuration name, environment, data center, etc as needed to further define a configuration for specific cases
+                        <ul>
+                            <li>Example of this would be to have a different hostname property at different levels in the path, based on environment</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="step25" class="step slide">
+            <h3>bindings</h3>
+            <div>
+                <span>stored as JSON documents at each znode in ZooKeeper</span>
+                <ul>
+                    <li>takes advantage of hierarchical nature of ZooKeeper data storage</li>
+                    <li>allows for path-based retrieval of configuration</li>
+                    <li>merging of data stored in nodes done at retrieval/lookup time</li>
+                </ul>
+                <code>"jdbc/rw-database"&nbsp;:&nbsp;{</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;"configPath"&nbsp;:&nbsp;"my-rw-datasource"</code>
+                <code>}</code>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Similar concepts to how configurations are stored, with regards to the hierarchy and merging strategy</li>
+                    <li>The “name” of the binding is a JNDI lookup name (more on this in a minute)</li>
+                    <li>The “configPath” property is a pointer to the node in the configuration tree that we want to associate with the application
+                        <ul>
+                            <li>Path may be relative or absolute.  Relative paths assuming the base path used to find the binding as the path to find the configuration.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="hint">
+        <p>Use a spacebar or arrow keys to navigate</p>
+    </div>
+    <script>
+        if ("ontouchstart" in document.documentElement) {
+            document.querySelector(".hint").innerHTML = "<p>Tap on the left or right to navigate</p>";
+        }
+    </script>
+    <script src="js/impress.js"></script>
+    <script src="js/impressConsole.js"></script>
+    <script src="js/impressLayout.js"></script>
+    <script>
+        impressLayout().init();
+        impress().init();
+        impressConsole().init();
+        impressConsole().open(); // If you want them to open automatically
+    </script>
+
+</body>
+
