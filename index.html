@@ -58,7 +58,7 @@
             </div>
         </div>
         <div id="step4" class="step slide">
-            <h3>the problem</h3>
+            <h3>problem</h3>
             <div>
                 <span>I want to configure my application</span>
             </div>
@@ -69,7 +69,7 @@
             </div>
         </div>
         <div id="step5" class="step slide">
-            <h3>the problem</h3>
+            <h3>problem</h3>
             <div>
                 <span>I want to make configuration changes to my application without re-deploying</span>
             </div>
@@ -81,7 +81,7 @@
             </div>
         </div>
         <div id="step6" class="step slide">
-            <h3>the problem</h3>
+            <h3>problem</h3>
             <div>
                 <span>I want to be able to spin up a new instance of an application without having to duplicate its configuration</span>
             </div>
@@ -96,7 +96,7 @@
             </div>
         </div>
         <div id="step7" class="step slide">
-            <h3>the problem</h3>
+            <h3>problem</h3>
             <div>
                 <span>I want configuration consistency between application instances and different applications</span>
             </div>
@@ -108,7 +108,7 @@
             </div>
         </div>
         <div id="step8" class="step slide">
-            <h3>the problem</h3>
+            <h3>problem</h3>
             <div>
                 <span>I want to avoid plain-text passwords in my configuration files</span>
             </div>
@@ -365,7 +365,7 @@
                 </ul>
             </div>
         </div>
-        <div id="span20" class="step slide">
+        <div id="step20" class="step slide">
             <h3>Exhibitor</h3>
             <img src="images/exhibitor.png" style="width:100%;height:100%;"/>
         </div>
@@ -379,8 +379,32 @@
                 </ul>
             </div>
         </div>
-        <div id="step21" class="step slide">
-            <h3>definitions</h3>
+        <div id="step22" class="step slide">
+            <h3>goals</h3>
+            <div>
+                <span>our solution was designed with the following goals:</span>
+                <ul>
+                    <li>accessing configuration must be simple</li>
+                    <li>configuration must always be available</li>
+                    <li>configuration should be customize-able based on environmental factors (test env, data center, etc)</li>
+                    <li>configuration changes should be versionable</li>
+                    <li>configuration changes should be available as soon as they are made</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Applications should be dumb when it comes to configuration
+                        <ul>
+                            <li>they connect to the service and get configuration based on certain identification parameters</li>
+                            <li>identification parameters can include application name, environment, data center, host name, port and/or version number</li>
+                        </ul>
+                    <li>We must handle the case where an application cannot connect to or loses connectivity to our ZooKeeper ensemble</li>
+                    <li>Just like we want to make deployment and configuration changes easy, we also need to easily be able to roll-back and application without having to undo configuration changes</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step23" class="step slide">
+            <h3>definition</h3>
             <div>
                 <span><span class="definition">con·fig·u·ra·tion</span> - a collection of properties that define a resource used by an application at runtime</span>
             </div>
@@ -391,39 +415,12 @@
                 </ul>
             </div>
         </div>
-        <div id="step22" class="step slide">
-            <h3>definitions</h3>
-            <div>
-                <span><span class="definition">bind·ing</span> - an association between an application and a specific configuration</span>
-            </div>
-            <div class="notes">
-                <ul>
-                    <li>Multiple applications may consume the same configuration -- no need to duplicate the configuration data</li>
-                    <li>Duplication of data causes mistakes</li>
-                </ul>
-            </div>
-        </div>
-        <div id="step23" class="step slide">
-            <h3>definitions</h3>
-            <div>
-                <span><span class="definition">bind·ing set</span> - the collection of bindings for a given application instance</span>
-            </div>
-            <div class="notes">
-                <ul>
-                    <li>We wanted to make it easier to find all of the configurations used by a particular application</li>
-                    <li>This allows us to document what an application consumes, as well as the reverse -- which applications are impacted when configuration X changes.</li>
-                </ul>
-            </div>
-        </div>
         <div id="step24" class="step slide">
             <h3>configuration</h3>
             <div>
                 <span>stored as JSON documents at each znode in ZooKeeper</span>
-                <ul>
-                    <li>takes advantage of hierarchical nature of ZooKeeper data storage</li>
-                    <li>allows for path-based retrieval of configuration</li>
-                    <li>merging of data stored in nodes done at retrieval/lookup time</li>
-                </ul>
+                 <br />
+                 <br />
                 <code>{</code>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;"@type":&nbsp;&nbsp;&nbsp;&nbsp;&lt;POJO class used for serialization to/from JSON&gt;,</code>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;"@creator":&nbsp;&lt;The creator class type responsible for converting</code>
@@ -437,43 +434,336 @@
             </div>
             <div class="notes">
                 <ul>
+                    <li>Descriptive format, but not as verbose as XML</li>
+                    <li>Able to take advantage of JSON parsing libraries to work with data at runtime</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step25" class="step slide">
+            <h3>ZooKeeper does the heavy lifting</h3>
+            <div>
+                <span>leverages the directory-like structure of znodes to store hierarchical data:</span>
+                <ul class="tree">
+                    <li>configs
+                        <ul>
+                            <li>jdbc
+                                <ul>
+                                    <li>my-datasource
+                                        <ul>
+                                            <li>development
+                                                <ul>
+                                                    <li>dc-east</li>
+                                                </ul>
+                                            </li>
+                                            <li>test
+                                                <ul>
+                                                    <li>dc-west</li>
+                                                </ul>
+                                            </li>
+                                            <li>production
+                                                <ul>
+                                                    <li>dc-east</li>
+                                                    <li>dc-west</li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
                     <li>Data stored in each znode may be a full configuration document or partial configuration document</li>
                     <li>Child nodes “override” parent nodes
                         <ul>
                             <li>JSON stored at a child node may include new properties or may re-define a property defined in a parent node</li>
                             <li>If the property is not defined in the child node, the value is inherited from the parent node</li>
+                            <li>Prevents duplication of data -- only enter values needed for that specific node</li>
                         </ul>
                     </li>
-                    <li>znode paths include the configuration name, environment, data center, etc as needed to further define a configuration for specific cases
+                    <li>znode paths include the configuration type, name, environment, and data center
                         <ul>
+                            <li>type and name are required, others are optional and only needed if there is specific configuration available for those cases</li>
                             <li>Example of this would be to have a different hostname property at different levels in the path, based on environment</li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+        <div id="step26" class="step slide">
+            <h3>lookup</h3>
+            <div>
+                <span>request configuration by using the most-specific path available:</span>
+                <br />
+                <br />
+                <br />
+                <code>/configs/{category}/{name}/{environment}/{data center}</code>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Potential full path is always used when requesting configuration</li>
+                    <li>Solution walks the path starting at the first node
+                        <ul>
+                            <li>data stored at the node is put in an accumulator
+                            <li>if the next node exists, its data is added to the accumulator, overriding any duplicate entries</li>
+                            <li>process repeats until all nodes are visited or a node does not exist from the requested path</li>
                         </ul>
                     </li>
                 </ul>
             </div>
         </div>
-        <div id="step25" class="step slide">
-            <h3>bindings</h3>
+        <div id="step27" class="step slide">
+            <h3>the "a-ha" moment</h3>
+            <div>
+                <span>separate the configuration definition from its association with an application instance</span>
+                <img src="images/bindings_illustration.png" />
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Keep an additional set of data in ZooKeeper that tracks exactly which specific configuration nodes are bound to the particular application</li>
+                    <li>Allows for different sets of configurations to be used based on application identification data provided at look up time</li>
+                    <li>Added bonus:  we have a way to determine exactly which applications are impacted by a configuration change, what downstream services an application relies on etc
+                        <ul>
+                            <li>This information is critical to ensuring the safety of changes to the system</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="step28" class="step slide">
+            <h3>definition</h3>
+            <div>
+                <span><span class="definition">bind·ing</span> - an association between an application and a specific configuration</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Multiple applications may consume the same configuration -- no need to duplicate the configuration data</li>
+                    <li>Duplication of data causes mistakes</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step29" class="step slide">
+            <h3>binding</h3>
             <div>
                 <span>stored as JSON documents at each znode in ZooKeeper</span>
-                <ul>
-                    <li>takes advantage of hierarchical nature of ZooKeeper data storage</li>
-                    <li>allows for path-based retrieval of configuration</li>
-                    <li>merging of data stored in nodes done at retrieval/lookup time</li>
-                </ul>
+                <br />
+                <br />
                 <code>"jdbc/rw-database"&nbsp;:&nbsp;{</code>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;"configPath"&nbsp;:&nbsp;"my-rw-datasource"</code>
+                <br />
                 <code>}</code>
             </div>
             <div class="notes">
                 <ul>
-                    <li>Similar concepts to how configurations are stored, with regards to the hierarchy and merging strategy</li>
-                    <li>The “name” of the binding is a JNDI lookup name (more on this in a minute)</li>
+                    <li>Similar concept to how configurations are stored, with regards to the hierarchy and override strategy</li>
+                    <li>The “name” of the binding is what the application will use to lookup the configuration (more on this in a minute)</li>
                     <li>The “configPath” property is a pointer to the node in the configuration tree that we want to associate with the application
                         <ul>
                             <li>Path may be relative or absolute.  Relative paths assuming the base path used to find the binding as the path to find the configuration.</li>
                         </ul>
                     </li>
+                </ul>
+            </div>
+        </div>
+        <div id="step30" class="step slide">
+            <h3>ZooKeeper does more heavy lifting</h3>
+            <div>
+                <span>leverages the directory-like structure of znodes to store hierarchical data:</span>
+                <ul class="tree">
+                    <li>bindings
+                        <ul>
+                            <li>development
+                                <ul>
+                                    <li>dc-east
+                                        <ul>
+                                            <li>my-application
+                                                <ul>
+                                                    <li>server1</li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>test
+                                <ul>
+                                    <li>dc-west
+                                        <ul>
+                                            <li>my-application></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>production
+                                <ul>
+                                    <li>dc-east
+                                        <ul>
+                                            <li>my-application
+                                                <ul>
+                                                    <li>&lt;1.2.3</li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>dc-west
+                                        <ul>
+                                            <li>my-application>
+                                                <ul>
+                                                    <li>&lt;1.2.3</li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Data stored in each znode may be a full collection of bindings or partial set of bindings</li>
+                    <li>Child nodes “override” parent nodes</li>
+                    <li>znode paths must include the environment, data center and application name
+                        <ul>
+                            <li>additional nodes include hostname, port and/or version (or combinations thereof)</li>
+                            <li>allows for special cases where custom configuration is needed for a sub-set of servers, versions, etc, such as A-B testing</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="step31" class="step slide">
+            <h3>lookup (reprise)</h3>
+            <div>
+                <span>request <span style="text-decoration: line-through;">configuration</span> the application's bindings:</span>
+                <br />
+                <br />
+                <br />
+                <code>/bindings/{environment}/{data center}/{app name}/{hostname|port|version}</code>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Application uses its identifying data to request the collection of bindings stored in ZooKeeper
+                        <ul>
+                            <li>IMPORTANT:  application code never directly requests a configuration.</li>
+                        </ul>
+                    </li>
+                    <li>Binding tree is walked top-down just like with configuration and stops when it visits all nodes or finds a node in the request path that does not exist</li>
+                    <li>Bindings are merged just like configurations to take into account overrides</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step32" class="step slide">
+            <h3>another "a-ha" moment</h3>
+            <div>
+                <span>provide the application with configured objects instead of just a map of properties:</span>
+                <ul>
+                    <li>group configurations together by category</li>
+                    <li>associate an object "creator" with each configuration</li>
+                    <li>"creator" produces a configured object from the merged configuration</li>
+                    <li>example:  data source creator produces a <code>java.sql.DataSource</code> implementation</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Allows the framework to enforce standards/conventions with regards to implementations/libraries used to consume other services in our enterprise</li>
+                    <li>Abstracts all of the details of how the configuration is stored and retrieved so the application doesn't know/doesn't care
+                        <ul>
+                            <li>Standardized on a well-known Java API - JNDI</li>
+                            <li>Makes the framework more flexible and able to modify the underlying implemntation</li>
+                        </ul>
+                    </li>
+                    <li>We saw some of this in action on earlier slides:
+                        <ul>
+                            <li>remember seeing the category placeholder in the configuration path</li>
+                            <li>remember seeing the "name" property in the binding JSON</li>
+                            <li>remember the @creator tag we saw earlier in the configuration JSON?</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="step33" class="step slide">
+            <h3>the request</h3>
+            <img src="images/request_flow.png" style="width:100%;height:100%" />
+            <div class="notes">
+                <ul>
+                    <li>request looks like a normal JNDI lookup from the application's perspective</li>
+                    <li>we keep an in-memory cache of created objects to speed up repeated lookup requests</li>
+                    <li>bindings are retrieved based on the application's identifying information
+                        <ul>
+                            <li>retrieved bindings are scanned for an entry whose "name" property matches the lookup string provided by the application</li>
+                            <li>if a match is found, the configuration data is retrieved and merged into a single map and cached on disk as a fail safe
+                                <ul>
+                                    <li>this fail-safe is used if during a future request, the service cannot be reached (offline/detached mode)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    <li>the merged configuration contains the creator that should be used.  the configuration is passed to the creator</li>
+                    <li>a configured object is cached and returned to the application, which is none the wiser to the fact that configuration was remotely retrieved</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step34" class="step slide">
+            <h3>problem</h3>
+            <div>
+                <span><span class="done">&#10003</span> I want to configure my application</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>We did one better:  someone else configured it..you simply just connected to the service and got what you needed</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step35" class="step slide">
+            <h3>problem</h3>
+            <div>
+                <span><span class="done">&#10003</span> I want to make configuration changes to my application without re-deploying</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>The configuration is no longer kept within the application.</li>
+                    <li>A simple restart will re-request the created, configured objects</li>
+                    <li>Future expansion - use the "watch" functionality of ZooKeeper to be notified when data changes</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step36" class="step slide">
+            <h3>problem</h3>
+            <div>
+                <span><span class="done">&#10003</span> I want to be able to spin up a new instance of an application without having to duplicate its configuration</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>If the bindings are the same, nothing has to be done for this to work.</li>
+                    <li>You can always define a new, specific binding set if required, but that should be the exception, not the rule</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step37" class="step slide">
+            <h3>problem</h3>
+            <div>
+                <span><span class="done">&#10003</span> I want configuration consistency between application instances and different applications</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Separation of configuration definitions from application bindings allows for one common configuration to be shared among applications WITHOUT having to copy and paste into each application's configuration files.</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step38" class="step slide">
+            <h3>problem</h3>
+            <div>
+                <span><span class="done">&#10003</span> I want to avoid plain-text passwords in my configuration files</span>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Passwords are now stored in the remote configuration data in ZooKeeper, and can be encrypted and protected by ACL's</li>
                 </ul>
             </div>
         </div>
