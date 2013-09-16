@@ -157,20 +157,27 @@ h1 {
     color:white
 }
 
+.footer span {
+    float:left;
+    font-family: 'Droid Sans';
+    font-size:14px;
+    color:white
+}
+
 code {
     font-family: 'Courier New';
     white-space:nowrap;
 }
 
-li code .decimal {
+code .decimal {
     color:#3387CC;'
 }
 
-li code .string {
+code .string {
     color:#65B042;
 }
 
-li code .new {
+code .new {
     color:#89bdff;
 }
 

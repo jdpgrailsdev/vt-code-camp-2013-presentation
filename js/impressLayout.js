@@ -19,7 +19,7 @@
         var init = function() {
             var steps = document.getElementsByClassName("step");
 
-            var r = 7000;
+            var r = 9000;
             for (var i = 0; i < steps.length; i++) {
                 var factor = ((Math.random() * 10) % 2) == 0 ? 1 : -1;
                 var theta = -i/(steps.length-1) * 2 * Math.PI;

@@ -149,13 +149,11 @@
         <div id="step11" class="step slide">
             <h3>Apache ZooKeeper</h3>
             <div>
-                <span>“ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.” <sup>1</sup></span>
+                <span>“ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.”</span>
             </div>
             <img src="images/zookeeper_small.gif" style="display:block;margin-left:auto;margin-right:auto;margin-top:50px;width:25%;height:25%" />
             <div class="footer">
-                <div>
-                    <sup>1</sup> http://zookeeper.apache.org
-                </div>
+                <span>http://zookeeper.apache.org</span>
             </div>
             <div class="notes">
                 <ul>
@@ -169,12 +167,10 @@
             <h3>Apache ZooKeeper</h3>
             <div>
                 <span>replicated servers that are organized into an “ensemble”</span>
-                <img src="images/zkservice.jpg" style="display:block;margin-left:auto;margin-right:auto;margin-top:50px;" /><sup style="float:right">1</sup>
+                <img src="images/zkservice.jpg" style="margin-left:auto;margin-right:auto;margin-top:50px;" />
             </div>
             <div class="footer">
-                <div>
-                    <sup>1</sup> http://zookeeper.apache.org/doc/trunk/zookeeperOver.html#sc_designGoals
-                </div>
+                <span>http://zookeeper.apache.org/doc/trunk/zookeeperOver.html#sc_designGoals</span>
             </div>
             <div class="notes">
                 <ul>
@@ -198,11 +194,11 @@
             <h3>Apache ZooKeeper</h3>
             <div>
                 <span>data model uses hierarchical name spacing</span>
-                <img src="images/zknamespace.jpg" style="display:block;margin-left:auto;margin-right:auto;margin-top:50px;" /><sup style="clear:right;vertical-align:top">1</sup>
+                <img src="images/zknamespace.jpg" style="margin-left:auto;margin-right:auto;margin-top:50px;" />
             </div>
             <div class="footer">
                 <div>
-                    <sup>1</sup> http://zookeeper.apache.org/doc/trunk/zookeeperOver.html#sc_dataModelNameSpace
+                    http://zookeeper.apache.org/doc/trunk/zookeeperOver.html#sc_dataModelNameSpace
                 </div>
             </div>
             <div class="notes">
@@ -339,6 +335,61 @@
             </div>
         </div>
         <div id="step19" class="step slide">
+            <h3>reading data from ZK with Curator</h3>
+            <div>
+                <code>client.create().withACL(Ids.<span class="new">CREATOR_ALL_ACL</span>)</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;.forPath(<span class="string">"/path/in/zk"</span>, <span class="string">"some data"</span>.getBytes());</code>
+                <br />
+                <br />
+                <code><span class="new">final byte[]</span> bindingData = client.getData().forPath(<span class="string">"/path/in/zk"</span>);</code>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Parent directories must exist when creating a znode</li>
+                    <li>ACL's can be set at creation time or later after a node has been created</li>
+                    <li>Data is retrieved by path</li>
+                    <li>Data is stored in ZK as raw bytes</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step20" class="step slide">
+            <h3>writing data to ZK with Curator</h3>
+            <div>
+                <code><span class="new">if</span>(client.checkExists().forPath(<span class="string">"/path/in/zk</span>) != <span class="new">null) {</span></code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;client.setData().forPath(<span class="string">"/path/in/zk"</span>, <span class="string">"new data"</span>.getBytes());</code>
+                <code>}</code>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Just like with reading, path must exist before writing data to an existing node</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step21" class="step slide">
+            <h3>watching data changes in ZK with Curator</h3>
+            <div>
+                <code><span class="new">class</span> WatcherImpl <span class="new">implements</span> CuratorWatcher {</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;@Override</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">public void</span> process(WatchedEvent event) {</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(<span class="string">"Processing event for path "</span> +</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;event.getPath() + <span class="string">"..."</span>);</code>
+                <br />
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;}</code>
+                <br />
+                <code>}</code>
+                <br />
+                <br />
+                <code>client.getData().usingWatcher(<span class="new">new</span> WatcherImpl())</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;.forPath(<span class="string">"/some/zk/path"</span>);</code>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Custom watcher gets called when an event happens at the path specified</li>
+                    <li>Events include node created, node deleted, node data changed or node children changed</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step22" class="step slide">
             <h3>Exhibitor</h3>
             <div>
                 <span>a Java-based supervisory system for ZooKeeper that provides:</span>
@@ -365,45 +416,28 @@
                 </ul>
             </div>
         </div>
-        <div id="step20" class="step slide">
+        <div id="step23" class="step slide">
             <h3>Exhibitor</h3>
             <img src="images/exhibitor.png" style="width:100%;height:100%;"/>
-        </div>
-        <div id="step21" class="step slide">
-            <h3>the solution</h3>
-            <img src="images/solution.png" />
             <div class="notes">
                 <ul>
-                    <li>Now that we have an overview of ZooKeeper, let’s re-examine the solution</li>
-                    <li>Simple premise:  applications request configuration from the centralized service (ZooKeeper)</li>
+                    <li>Example of the znode tree view in the Exhibitor UI</li>
+                    <li>very useful for looking at both the state of your ensemble and what data is currently stored in ZK</li>
                 </ul>
             </div>
         </div>
-        <div id="step22" class="step slide">
-            <h3>goals</h3>
-            <div>
-                <span>our solution was designed with the following goals:</span>
-                <ul>
-                    <li>accessing configuration must be simple</li>
-                    <li>configuration must always be available</li>
-                    <li>configuration should be customize-able based on environmental factors (test env, data center, etc)</li>
-                    <li>configuration changes should be versionable</li>
-                    <li>configuration changes should be available as soon as they are made</li>
-                </ul>
-            </div>
+        <div id="step24" class="step slide">
+            <h3>what we made</h3>
+            <img src="images/makingpancakes.jpg" />
             <div class="notes">
                 <ul>
-                    <li>Applications should be dumb when it comes to configuration
-                        <ul>
-                            <li>they connect to the service and get configuration based on certain identification parameters</li>
-                            <li>identification parameters can include application name, environment, data center, host name, port and/or version number</li>
-                        </ul>
-                    <li>We must handle the case where an application cannot connect to or loses connectivity to our ZooKeeper ensemble</li>
-                    <li>Just like we want to make deployment and configuration changes easy, we also need to easily be able to roll-back and application without having to undo configuration changes</li>
+                    <li>Now that we have an overview of ZooKeeper, Curator and Exhibitor, let’s take a look at exactly what we built on top of it</li>
+                    <li>Our solution is simple at its core:  applications request configuration from the centralized service (ZooKeeper)</li>
+                    <li>Let's start by discussing some of the concepts behind the solution</li>
                 </ul>
             </div>
         </div>
-        <div id="step23" class="step slide">
+        <div id="step25" class="step slide">
             <h3>definition</h3>
             <div>
                 <span><span class="definition">con·fig·u·ra·tion</span> - a collection of properties that define a resource used by an application at runtime</span>
@@ -415,7 +449,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step24" class="step slide">
+        <div id="step26" class="step slide">
             <h3>configuration</h3>
             <div>
                 <span>stored as JSON documents at each znode in ZooKeeper</span>
@@ -439,7 +473,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step25" class="step slide">
+        <div id="step27" class="step slide">
             <h3>ZooKeeper does the heavy lifting</h3>
             <div>
                 <span>leverages the directory-like structure of znodes to store hierarchical data:</span>
@@ -494,7 +528,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step26" class="step slide">
+        <div id="step28" class="step slide">
             <h3>lookup</h3>
             <div>
                 <span>request configuration by using the most-specific path available:</span>
@@ -516,7 +550,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step27" class="step slide">
+        <div id="step29" class="step slide">
             <h3>the "a-ha" moment</h3>
             <div>
                 <span>separate the configuration definition from its association with an application instance</span>
@@ -534,7 +568,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step28" class="step slide">
+        <div id="step30" class="step slide">
             <h3>definition</h3>
             <div>
                 <span><span class="definition">bind·ing</span> - an association between an application and a specific configuration</span>
@@ -546,7 +580,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step29" class="step slide">
+        <div id="step31" class="step slide">
             <h3>binding</h3>
             <div>
                 <span>stored as JSON documents at each znode in ZooKeeper</span>
@@ -569,7 +603,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step30" class="step slide">
+        <div id="step32" class="step slide">
             <h3>ZooKeeper does more heavy lifting</h3>
             <div>
                 <span>leverages the directory-like structure of znodes to store hierarchical data:</span>
@@ -593,7 +627,7 @@
                                 <ul>
                                     <li>dc-west
                                         <ul>
-                                            <li>my-application></li>
+                                            <li>my-application</li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -611,11 +645,7 @@
                                     </li>
                                     <li>dc-west
                                         <ul>
-                                            <li>my-application>
-                                                <ul>
-                                                    <li>&lt;1.2.3</li>
-                                                </ul>
-                                            </li>
+                                            <li>my-application</li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -637,10 +667,10 @@
                 </ul>
             </div>
         </div>
-        <div id="step31" class="step slide">
+        <div id="step33" class="step slide">
             <h3>lookup (reprise)</h3>
             <div>
-                <span>request <span style="text-decoration: line-through;">configuration</span> the application's bindings:</span>
+                <span>request <span style="text-decoration: line-through;">configuration</span> the <strong>application's</strong> bindings:</span>
                 <br />
                 <br />
                 <br />
@@ -658,16 +688,18 @@
                 </ul>
             </div>
         </div>
-        <div id="step32" class="step slide">
+        <div id="step34" class="step slide">
             <h3>another "a-ha" moment</h3>
             <div>
-                <span>provide the application with configured objects instead of just a map of properties:</span>
-                <ul>
-                    <li>group configurations together by category</li>
-                    <li>associate an object "creator" with each configuration</li>
-                    <li>"creator" produces a configured object from the merged configuration</li>
-                    <li>example:  data source creator produces a <code>java.sql.DataSource</code> implementation</li>
-                </ul>
+                <span>create objects from retrieved, merged configuration:</span>
+                <br />
+                <br />
+                <code>javax.sql.DataSource dataSource = (javax.sql.DataSource)</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;ConfigProvider.INSTANCE.lookup(<span class="string">"jdbc/my-data-source</span>);</code>
+                <br />
+                <br />
+                <code>javax.mail.Session session = (javax.mail.Session)</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;ConfigProvider.INSTANCE.lookup(<span class="string">"mail/my-smtp-server</span>);</code>
             </div>
             <div class="notes">
                 <ul>
@@ -688,7 +720,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step33" class="step slide">
+        <div id="step35" class="step slide">
             <h3>the request</h3>
             <img src="images/request_flow.png" style="width:100%;height:100%" />
             <div class="notes">
@@ -709,7 +741,31 @@
                 </ul>
             </div>
         </div>
-        <div id="step34" class="step slide">
+        <div id="step36" class="step slide">
+            <h3>the request in code</h3>
+            <div>
+                <code><span class="new">public</span> Object lookup(String name) {</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">final</span> Context context = new Context(lookupName);</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">final</span> List&lt;Command&gt; commands = <span class="new">new</span> ArrayList&lt;Command&gt;();</code>
+                <br />
+                <br />
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">//convert application ID info into a ZK path</span></code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;commands.add(<span class="new">new</span> BindingPathCommand());</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">//retrieve binding set from ZK using binding path </span></code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;commands.add(<span class="new">new</span> BindingCommand());</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">//retrieve the config from ZK based on the data in the binding set</span></code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;commands.add(<span class="new">new</span> ConfigCommand());</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">//create object from retrieved, merged config</span></code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;commands.add(<span class="new">new</span> ObjectCreatorCommand());</code>
+                <br />
+                <br />
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">final</span> Chain chain = <span class="new">new</span> ChainBase(commands);</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;chain.execute(context);</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">return</span> ObjectFactory.create(context.getConfig());</code>
+                <code>}</code>
+            </div>
+        </div>
+        <div id="step37" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to configure my application</span>
@@ -720,7 +776,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step35" class="step slide">
+        <div id="step38" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to make configuration changes to my application without re-deploying</span>
@@ -733,7 +789,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step36" class="step slide">
+        <div id="step39" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to be able to spin up a new instance of an application without having to duplicate its configuration</span>
@@ -745,7 +801,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step37" class="step slide">
+        <div id="step40" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want configuration consistency between application instances and different applications</span>
@@ -756,7 +812,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step38" class="step slide">
+        <div id="step41" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to avoid plain-text passwords in my configuration files</span>
