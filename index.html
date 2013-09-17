@@ -179,7 +179,8 @@
                     <li>The ensemble uses an election algorithm to anoint a leader
                         <ul>
                             <li>Leader is responsible for handling all “write” requests</li>
-                            <li>Recommended that you have at least 5 members in the ensemble</li>
+                            <li>With 2n + 1 members, can withstand n failures</li>
+                            <li>Recommended that you have at least 5 members in the ensemble, minimum is 3</li>
                         </ul>
                     </li>
                     <li>Clients can connect to any member of the ensemble
@@ -764,8 +765,41 @@
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">return</span> ObjectFactory.create(context.getConfig());</code>
                 <code>}</code>
             </div>
+            <div class="notes">
+                <ul>
+                    <li>chain of responsiblity pattern</li>
+                    <li>allows for easy interjection of steps as algorithm evolves</li>
+                    <li>result of executing the chain is the merged configuration</li>
+                    <li>merged configuration is passed to object creator defined in the configuration</li>
+                    <li>final result is an object created from the merged configuration</li>
+                </ul>
+            </div>
         </div>
         <div id="step37" class="step slide">
+            <h3>protecting the cookie jar</h3>
+            <img src="images/cookie_monster.png" style="float:right;width:50%;height:50%" />
+            <div>
+                <ul>
+                    <li>SASL authentication</li>
+                    <li>ACL's</li>
+                    <li>encryption</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>Centralizing configuration data requires being smart about what is stored in plain text in ZK</li>
+                    <li>make use of built-in authentication provider and ACL support discussed earlier
+                        <ul>
+                            <li>SASL auth provider used to identify type of client (application or management)</li>
+                            <li>applications have read-only access to ZK data through ACL enforcement</li>
+                            <li>tree path traversal restricted by ACL enforcement (dev apps can only read from dev tree, etc)</li>
+                        </ul>
+                    </li>
+                    <li>password fields in JSON data stored in ZK is encrypted at rest and decrypted upon request</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step38" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to configure my application</span>
@@ -776,7 +810,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step38" class="step slide">
+        <div id="step39" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to make configuration changes to my application without re-deploying</span>
@@ -789,7 +823,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step39" class="step slide">
+        <div id="step40" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to be able to spin up a new instance of an application without having to duplicate its configuration</span>
@@ -801,7 +835,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step40" class="step slide">
+        <div id="step41" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want configuration consistency between application instances and different applications</span>
@@ -812,7 +846,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step41" class="step slide">
+        <div id="step42" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to avoid plain-text passwords in my configuration files</span>
@@ -821,6 +855,56 @@
                 <ul>
                     <li>Passwords are now stored in the remote configuration data in ZooKeeper, and can be encrypted and protected by ACL's</li>
                 </ul>
+            </div>
+        </div>
+        <div id="step43" class="step slide">
+            <h3>summary</h3>
+            <img src="images/fry.jpg" style="float:right;width:70%;height:70%" />
+            <div>
+                <ul>
+                    <li>hierarchical</li>
+                    <li>distributed</li>
+                    <li>scalable</li>
+                    <li>secured</li>
+                    <li>tolerant</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>code doesn't really do that much -- power is in how the data is stored in ZK</li>
+                    <li>power of inheritence reduces the copy and paste pasta of configurations</li>
+                    <li>use ZK for what it does well -- data storage, consistency, distribution and fault tolerance</li>
+                    <li>enforce good habits, such as access control and data encryption</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step44" class="step slide">
+            <h3>other thoughs</h3>
+            <div>
+                <span>possible extensions</span>
+                <ul>
+                    <li>deployment data</li>
+                    <li>dependency detection</li>
+                    <li>risk calculation</li>
+                    <li>outage impact</li>
+                </ul>
+            </div>
+            <div class="notes">
+                <ul>
+                    <li>store deployment information side-by-side with bindings</li>
+                    <li>scan binding data to map out dependencies in your enterprise</li>
+                    <li>determine the risk of a deployment based on the number of systems that depend on the application</li>
+                    <li>when something goes down, quickly determine the reach of the outage with regards to dependencies</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step45" class="step slide">
+            <img src="images/thank_you.png" style="display: block;margin-left: auto;margin-right: auto"/>
+            <div style="text-align: center">
+                <span><strong>Presentation</strong> @ http://tinyurl.com/o4fdgsk</span>
+                <br/>
+                <br />
+                <span><strong>Contact Me</strong> @ jonathan.pearlin@dealer.com</span>
             </div>
         </div>
     </div>
@@ -838,8 +922,8 @@
     <script>
         impressLayout().init();
         impress().init();
-        impressConsole().init();
-        impressConsole().open(); // If you want them to open automatically
+        //impressConsole().init();
+        //impressConsole().open(); // If you want them to open automatically
     </script>
 </body>
 
