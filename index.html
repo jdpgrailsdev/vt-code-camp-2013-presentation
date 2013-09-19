@@ -33,6 +33,14 @@
                     </div>
                 </div>
             </div>
+            <div class="notes">
+                <ul>
+                    <li>Welcome</li>
+                    <li>I'm here to talk about a centralized configuration solution that we built @ Dealer.com here in Burlington</li>
+                    <li>In this talk, I am going to discuss the rationale behind our decision to build such a solution, as well as some of the technical details behind it</li>
+                    <li>But, before we start, let me introduce myself a bit</li>
+                </ul>
+            </div>
         </div>
         <div id="step2" class="step slide">
             <h3>about me</h3>
@@ -147,6 +155,16 @@
             </div>
         </div>
         <div id="step11" class="step slide">
+            <h3>ummmm...I think you skipped a bit</h3>
+            <img src="images/lard_lad.jpg" />
+            <div class="notes">
+                <ul>
+                    <li>Yes, I did</li>
+                    <li>We will dig into the actual solution in a bit, but first, I want to take a look at Apache ZooKeeper and some of the related tools that we used as a foundation for our solution</li>
+                </ul>
+            </div>
+        </div>
+        <div id="step12" class="step slide">
             <h3>Apache ZooKeeper</h3>
             <div>
                 <span>“ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.”</span>
@@ -163,7 +181,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step12" class="step slide">
+        <div id="step13" class="step slide">
             <h3>Apache ZooKeeper</h3>
             <div>
                 <span>replicated servers that are organized into an “ensemble”</span>
@@ -191,7 +209,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step13" class="step slide">
+        <div id="step14" class="step slide">
             <h3>Apache ZooKeeper</h3>
             <div>
                 <span>data model uses hierarchical name spacing</span>
@@ -220,7 +238,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step14" class="step slide">
+        <div id="step15" class="step slide">
             <h3>Apache ZooKeeper</h3>
             <div>
                 <span>other guarantees:</span>
@@ -234,7 +252,7 @@
             <div class="notes">
             </div>
         </div>
-        <div id="step15" class="step slide">
+        <div id="step16" class="step slide">
             <h3>Apache ZooKeeper</h3>
             <div>
                 <span>supports the following client authentication schemes “out of the box”:</span>
@@ -252,7 +270,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step16" class="step slide">
+        <div id="step17" class="step slide">
             <h3>Apache ZooKeeper</h3>
             <div>
                 <span>access to znodes can be controlled with applied ACL’s</span>
@@ -280,7 +298,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step17" class="step slide">
+        <div id="step18" class="step slide">
             <h3>Apache ZooKeeper</h3>
             <div>
                 <span>ships with Java, C, Perl and Python client bindings</span>
@@ -305,7 +323,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step18" class="step slide">
+        <div id="step19" class="step slide">
             <h3>Apache Curator</h3>
             <img src="images/curator-logo.png" style="float:right" />
             <div>
@@ -335,7 +353,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step19" class="step slide">
+        <div id="step20" class="step slide">
             <h3>reading data from ZK with Curator</h3>
             <div>
                 <code>client.create().withACL(Ids.<span class="new">CREATOR_ALL_ACL</span>)</code>
@@ -353,10 +371,10 @@
                 </ul>
             </div>
         </div>
-        <div id="step20" class="step slide">
+        <div id="step21" class="step slide">
             <h3>writing data to ZK with Curator</h3>
             <div>
-                <code><span class="new">if</span>(client.checkExists().forPath(<span class="string">"/path/in/zk</span>) != <span class="new">null) {</span></code>
+                <code><span class="new">if</span>(client.checkExists().forPath(<span class="string">"/path/in/zk"</span>) != <span class="new">null) {</span></code>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;client.setData().forPath(<span class="string">"/path/in/zk"</span>, <span class="string">"new data"</span>.getBytes());</code>
                 <code>}</code>
             </div>
@@ -366,7 +384,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step21" class="step slide">
+        <div id="step22" class="step slide">
             <h3>watching data changes in ZK with Curator</h3>
             <div>
                 <code><span class="new">class</span> WatcherImpl <span class="new">implements</span> CuratorWatcher {</code>
@@ -390,7 +408,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step22" class="step slide">
+        <div id="step23" class="step slide">
             <h3>Exhibitor</h3>
             <div>
                 <span>a Java-based supervisory system for ZooKeeper that provides:</span>
@@ -417,7 +435,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step23" class="step slide">
+        <div id="step24" class="step slide">
             <h3>Exhibitor</h3>
             <img src="images/exhibitor.png" style="width:100%;height:100%;"/>
             <div class="notes">
@@ -427,7 +445,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step24" class="step slide">
+        <div id="step25" class="step slide">
             <h3>what we made</h3>
             <img src="images/makingpancakes.jpg" />
             <div class="notes">
@@ -438,7 +456,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step25" class="step slide">
+        <div id="step26" class="step slide">
             <h3>definition</h3>
             <div>
                 <span><span class="definition">con·fig·u·ra·tion</span> - a collection of properties that define a resource used by an application at runtime</span>
@@ -450,7 +468,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step26" class="step slide">
+        <div id="step27" class="step slide">
             <h3>configuration</h3>
             <div>
                 <span>stored as JSON documents at each znode in ZooKeeper</span>
@@ -474,7 +492,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step27" class="step slide">
+        <div id="step28" class="step slide">
             <h3>ZooKeeper does the heavy lifting</h3>
             <div>
                 <span>leverages the directory-like structure of znodes to store hierarchical data:</span>
@@ -529,7 +547,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step28" class="step slide">
+        <div id="step29" class="step slide">
             <h3>lookup</h3>
             <div>
                 <span>request configuration by using the most-specific path available:</span>
@@ -551,7 +569,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step29" class="step slide">
+        <div id="step30" class="step slide">
             <h3>the "a-ha" moment</h3>
             <div>
                 <span>separate the configuration definition from its association with an application instance</span>
@@ -569,7 +587,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step30" class="step slide">
+        <div id="step31" class="step slide">
             <h3>definition</h3>
             <div>
                 <span><span class="definition">bind·ing</span> - an association between an application and a specific configuration</span>
@@ -581,7 +599,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step31" class="step slide">
+        <div id="step32" class="step slide">
             <h3>binding</h3>
             <div>
                 <span>stored as JSON documents at each znode in ZooKeeper</span>
@@ -604,7 +622,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step32" class="step slide">
+        <div id="step33" class="step slide">
             <h3>ZooKeeper does more heavy lifting</h3>
             <div>
                 <span>leverages the directory-like structure of znodes to store hierarchical data:</span>
@@ -668,10 +686,10 @@
                 </ul>
             </div>
         </div>
-        <div id="step33" class="step slide">
+        <div id="step34" class="step slide">
             <h3>lookup (reprise)</h3>
             <div>
-                <span>request <span style="text-decoration: line-through;">configuration</span> the <strong>application's</strong> bindings:</span>
+                <span>request the <strong>application's</strong> bindings:</span>
                 <br />
                 <br />
                 <br />
@@ -689,7 +707,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step34" class="step slide">
+        <div id="step35" class="step slide">
             <h3>another "a-ha" moment</h3>
             <div>
                 <span>create objects from retrieved, merged configuration:</span>
@@ -721,7 +739,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step35" class="step slide">
+        <div id="step36" class="step slide">
             <h3>the request</h3>
             <img src="images/request_flow.png" style="width:100%;height:100%" />
             <div class="notes">
@@ -742,7 +760,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step36" class="step slide">
+        <div id="step37" class="step slide">
             <h3>the request in code</h3>
             <div>
                 <code><span class="new">public</span> Object lookup(String name) {</code>
@@ -775,7 +793,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step37" class="step slide">
+        <div id="step38" class="step slide">
             <h3>protecting the cookie jar</h3>
             <img src="images/cookie_monster.png" style="float:right;width:50%;height:50%" />
             <div>
@@ -799,7 +817,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step38" class="step slide">
+        <div id="step39" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to configure my application</span>
@@ -810,7 +828,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step39" class="step slide">
+        <div id="step40" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to make configuration changes to my application without re-deploying</span>
@@ -823,7 +841,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step40" class="step slide">
+        <div id="step41" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to be able to spin up a new instance of an application without having to duplicate its configuration</span>
@@ -835,7 +853,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step41" class="step slide">
+        <div id="step42" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want configuration consistency between application instances and different applications</span>
@@ -846,7 +864,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step42" class="step slide">
+        <div id="step43" class="step slide">
             <h3>problem</h3>
             <div>
                 <span><span class="done">&#10003</span> I want to avoid plain-text passwords in my configuration files</span>
@@ -857,7 +875,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step43" class="step slide">
+        <div id="step44" class="step slide">
             <h3>summary</h3>
             <img src="images/fry.jpg" style="float:right;width:70%;height:70%" />
             <div>
@@ -878,7 +896,7 @@
                 </ul>
             </div>
         </div>
-        <div id="step44" class="step slide">
+        <div id="step45" class="step slide">
             <h3>other thoughs</h3>
             <div>
                 <span>possible extensions</span>
@@ -898,13 +916,25 @@
                 </ul>
             </div>
         </div>
-        <div id="step45" class="step slide">
+        <div id="step46" class="step slide">
+            <h3>additional reading</h3>
+            <div>
+                <span style="font-size: 18px;"><strong style="color:#ff9900;">Distributed apps with ZooKeeper</strong> - http://blog.cloudera.com/blog/2013/02/how-to-use-apache-zookeeper-to-build-distributed-apps-and-why/</span>
+                <br />
+                <span style="font-size: 18px;"><strong style="color:#ff9900;">Exhibitor @ Netflix</strong> - http://techblog.netflix.com/2012/04/introducing-exhibitor-supervisor-system.html</span>
+                <br />
+                <span style="font-size: 18px;"><strong style="color:#ff9900;">ZooKeeper @ Zynga</strong> - http://code.zynga.com/2011/08/updating-thousands-of-configuration-files-in-under-a-second/</span>
+                <br />
+                <span style="font-size: 18px;"><strong style="color:#ff9900;">Jones</strong> -  https://github.com/mwhooker/jones</span>
+            </div>
+        </div>
+        <div id="step47" class="step slide">
             <img src="images/thank_you.png" style="display: block;margin-left: auto;margin-right: auto"/>
             <div style="text-align: center">
                 <span><strong>Presentation</strong> @ http://tinyurl.com/o4fdgsk</span>
                 <br/>
                 <br />
-                <span><strong>Contact Me</strong> @ jonathan.pearlin@dealer.com</span>
+                <span><strong>Contact Me</strong> @ jonathan.pearlin at dealer.com</span>
             </div>
         </div>
     </div>
