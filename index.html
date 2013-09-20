@@ -150,16 +150,18 @@
                 <ul>
                     <li>Store configuration in a centralize location accessible by all applications</li>
                     <li>Apache ZooKeeper provides us with both a centralized service AND hierarchical data storage</li>
-                    <li>Before we dig into the solution in more details, lets first get a brief overview of Apache ZooKeeper and some of the tooling around it</li>
                 </ul>
             </div>
         </div>
         <div id="step11" class="step slide">
-            <h3>ummmm...I think you skipped a bit</h3>
-            <img src="images/lard_lad.jpg" />
+            <h3>ummmm...that's it?</h3>
+            <br />
+            <br />
+            <br />
+            <img src="images/lard_lad.jpg" style="display:block;margin-left:auto;margin-right:auto;"/>
             <div class="notes">
                 <ul>
-                    <li>Yes, I did</li>
+                    <li>No!</li>
                     <li>We will dig into the actual solution in a bit, but first, I want to take a look at Apache ZooKeeper and some of the related tools that we used as a foundation for our solution</li>
                 </ul>
             </div>
@@ -356,11 +358,14 @@
         <div id="step20" class="step slide">
             <h3>reading data from ZK with Curator</h3>
             <div>
-                <code>client.create().withACL(Ids.<span class="new">CREATOR_ALL_ACL</span>)</code>
+                <code>client.create().withACL(<span class="new">new</span> Acl(ZooDefs.Perms.<span class="new">READ</span>, </code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;ZooDefs.Ids.<span class="new">ANYONE_ID_UNSAFE</span>))</code>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;.forPath(<span class="string">"/path/in/zk"</span>, <span class="string">"some data"</span>.getBytes());</code>
                 <br />
                 <br />
-                <code><span class="new">final byte[]</span> bindingData = client.getData().forPath(<span class="string">"/path/in/zk"</span>);</code>
+                <code><span class="new">if</span>(client.checkExists().forPath(<span class="string">"/path/in/zk"</span>) != <span class="new">null) {</span></code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">final byte[]</span> bindingData = client.getData().forPath(<span class="string">"/path/in/zk"</span>);</code>
+                <code>}</code>
             </div>
             <div class="notes">
                 <ul>
@@ -428,6 +433,7 @@
                     <li>Web-based UI for managing a ZooKeeper instance
                         <ul>
                             <li>Installed on each ZooKeeper server in your ensemble</li>
+                            <li>Uses REST interface to talk between Exhibitor instances</li>
                         </ul>
                     </li>
                     <li>Can be used to manage the ZooKeeper configuration files pushed to each instance in the ensemble</li>
@@ -487,8 +493,10 @@
             </div>
             <div class="notes">
                 <ul>
-                    <li>Descriptive format, but not as verbose as XML</li>
+                    <li>Descriptive format</li>
+                    <li>More compact than XML/less verbose than XML</li>
                     <li>Able to take advantage of JSON parsing libraries to work with data at runtime</li>
+                    <li>JavaScript friendly -- better fit for use in our UI</li>
                 </ul>
             </div>
         </div>
@@ -925,7 +933,7 @@
                 <br />
                 <span style="font-size: 18px;"><strong style="color:#ff9900;">ZooKeeper @ Zynga</strong> - http://code.zynga.com/2011/08/updating-thousands-of-configuration-files-in-under-a-second/</span>
                 <br />
-                <span style="font-size: 18px;"><strong style="color:#ff9900;">Jones</strong> -  https://github.com/mwhooker/jones</span>
+                <span style="font-size: 18px;"><strong style="color:#ff9900;">Jones</strong> - https://github.com/mwhooker/jones</span>
             </div>
         </div>
         <div id="step47" class="step slide">
@@ -952,8 +960,8 @@
     <script>
         impressLayout().init();
         impress().init();
-        //impressConsole().init();
-        //impressConsole().open(); // If you want them to open automatically
+       // impressConsole().init();
+       // impressConsole().open(); // If you want them to open automatically
     </script>
 </body>
 
