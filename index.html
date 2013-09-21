@@ -37,7 +37,7 @@
                 <ul>
                     <li>Welcome</li>
                     <li>I'm here to talk about a centralized configuration solution that we built @ Dealer.com here in Burlington</li>
-                    <li>In this talk, I am going to discuss the rationale behind our decision to build such a solution, as well as some of the technical details behind it</li>
+                    <li>In this talk, I am going to talk about our rationale for building this service, as well as the technical details behind it</li>
                     <li>But, before we start, let me introduce myself a bit</li>
                 </ul>
             </div>
@@ -59,9 +59,9 @@
             <div class="notes">
                 <ul>
                     <li>If only this were true...</li>
-                    <li>Configuration is a necessity of non-trivial applications and mature software development life-cycles.</li>
+                    <li>Configuration is a necessity of non-trivial applications, especially in an enterprise software environment.</li>
                     <li>The more complex the system or the more complex the environment, the more critical configuration becomes.</li>
-                    <li>However, despite being critical to the success of software development, there are problems related to implementing application configuration.</li>
+                    <li>However, despite being critical to the success of software development, configuration is often something that is hard to get right.</li>
                 </ul>
             </div>
         </div>
@@ -73,6 +73,7 @@
             <div class="notes">
                 <ul>
                     <li>I think that we can all relate to this problem</li>
+                    <li>Applications start out simple, but eventually we need to be able to change values at runtime based on factors such as environment or which server they run on, etc</li>
                 </ul>
             </div>
         </div>
@@ -95,11 +96,8 @@
             </div>
             <div class="notes">
                 <ul>
-                    <li>I should be able to spin up a new VM and install my application without worrying about making sure I got the configuration right for the target environment
-                        <ul>
-                            <li>Let it find its configuration based on some identification parameters</li>
-                        </ul>
-                    </li>
+                    <li>I should be able to spin up a new VM and install my application without worrying about making sure I got the configuration right for the target environment</li>
+                    <li>I really want to avoid mistakes made when copying configuration between applications</li>
                 </ul>
             </div>
         </div>
@@ -110,8 +108,8 @@
             </div>
             <div class="notes">
                 <ul>
-                    <li>Avoid copy and paste mistakes</li>
-                    <li>Avoid issues where two different apps that should be using the same configuration do not due to miscommunication/mistakes</li>
+                    <li>Just like with the previous problem, I want to avoid copy and paste mistakes</li>
+                    <li>Hopefully eliminate communication mistakes where one app owner has to tell another what to put in their configuration</li>
                 </ul>
             </div>
         </div>
@@ -127,7 +125,7 @@
             </div>
         </div>
         <div id="step9" class="step slide">
-            <h3>the solution</h3>
+            <h3>our solution</h3>
             <div>
                 <span>centralized, hierarchical configuration management organized by environment, data center and application</span>
             </div>
@@ -144,7 +142,7 @@
             </div>
         </div>
         <div id="step10" class="step slide">
-            <h3>the solution</h3>
+            <h3>our solution</h3>
             <img src="images/solution.png" />
             <div class="notes">
                 <ul>
@@ -162,7 +160,7 @@
             <div class="notes">
                 <ul>
                     <li>No!</li>
-                    <li>We will dig into the actual solution in a bit, but first, I want to take a look at Apache ZooKeeper and some of the related tools that we used as a foundation for our solution</li>
+                    <li>We will dig into the actual solution in a bit, but first, let's take a look at Apache ZooKeeper and some of the related tools that we used as a foundation for our solution</li>
                 </ul>
             </div>
         </div>
@@ -205,7 +203,7 @@
                     </li>
                     <li>Clients can connect to any member of the ensemble
                         <ul>
-                            <li>Writes are routed to the “leader” </li>
+                            <li>Writes are routed to the “leader”</li>
                         </ul>
                     </li>
                 </ul>
@@ -252,6 +250,10 @@
                 </ul>
             </div>
             <div class="notes">
+                <ul>
+                    <li>ZK manages the consistency of your data for you so you don't have to worry about it </li>
+                    <li>This is just a small portion of what ZK provides with regards to orchestration and distributed state management</li>
+                </ul>
             </div>
         </div>
         <div id="step16" class="step slide">
@@ -306,7 +308,10 @@
                 <span>ships with Java, C, Perl and Python client bindings</span>
                 <br />
                 <br />
-                <span>information on additional bindings can be found at:  https://cwiki.apache.org/confluence/display/ZOOKEEPER/ZKClientBindings </span>
+                <br />
+                <span style="font-size:18px">information on additional bindings can be found at:
+                <br />
+                https://cwiki.apache.org/confluence/display/ZOOKEEPER/ZKClientBindings </span>
             </div>
             <div class="notes">
                 <ul>
@@ -346,8 +351,8 @@
                 <ul>
                     <li>A “curator” is a keeper or custodian of a museum or other collection (in other words, a zoo keeper’s boss)</li>
                     <li>Originally created by Netflix, open sourced and given to the Apache Software Foundation to sheppard</li>
-                    <li>Includes “recipes” for common operations/uses of ZooKeeper (i.e. distributed locking, etc)</li>
-                    <li>Much easier to use than the raw Java client driver
+                    <li>The Curator project also includes “recipes” for common operations/uses of ZooKeeper (i.e. distributed locking, etc)</li>
+                    <li>Much easier to use than the raw Java client driver, thanks to its fluent style
                         <ul>
                             <li>In practice, we found it much easier to deal with exceptions/errors and to get statistics back from znodes</li>
                         </ul>
@@ -359,8 +364,8 @@
             <h3>reading data from ZK with Curator</h3>
             <div>
                 <code>client.create().withACL(<span class="new">new</span> Acl(ZooDefs.Perms.<span class="new">READ</span>, </code>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;ZooDefs.Ids.<span class="new">ANYONE_ID_UNSAFE</span>))</code>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;.forPath(<span class="string">"/path/in/zk"</span>, <span class="string">"some data"</span>.getBytes());</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;ZooDefs.Ids.<span class="new">ANYONE_ID_UNSAFE</span>)).forPath(<span class="string">"/path/in/zk"</span>,</code>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"some data"</span>.getBytes());</code>
                 <br />
                 <br />
                 <code><span class="new">if</span>(client.checkExists().forPath(<span class="string">"/path/in/zk"</span>) != <span class="new">null) {</span></code>
@@ -497,6 +502,7 @@
                     <li>More compact than XML/less verbose than XML</li>
                     <li>Able to take advantage of JSON parsing libraries to work with data at runtime</li>
                     <li>JavaScript friendly -- better fit for use in our UI</li>
+                    <li>We'll talk more in a bit about the @type and @creator metadata fields in this example</li>
                 </ul>
             </div>
         </div>
@@ -551,7 +557,6 @@
                             <li>Example of this would be to have a different hostname property at different levels in the path, based on environment</li>
                         </ul>
                     </li>
-
                 </ul>
             </div>
         </div>
@@ -574,6 +579,7 @@
                             <li>process repeats until all nodes are visited or a node does not exist from the requested path</li>
                         </ul>
                     </li>
+                    <li>There's a problem with this approach:  applications have to be aware of exactly which node in the tree that they want to request</li>
                 </ul>
             </div>
         </div>
@@ -708,6 +714,7 @@
                     <li>Application uses its identifying data to request the collection of bindings stored in ZooKeeper
                         <ul>
                             <li>IMPORTANT:  application code never directly requests a configuration.</li>
+                            <li>An application knows about itself (i.e. its name, hostname, port and version) and can use that data to find out which configurations it is bound to</li>
                         </ul>
                     </li>
                     <li>Binding tree is walked top-down just like with configuration and stops when it visits all nodes or finds a node in the request path that does not exist</li>
@@ -737,13 +744,7 @@
                             <li>Makes the framework more flexible and able to modify the underlying implemntation</li>
                         </ul>
                     </li>
-                    <li>We saw some of this in action on earlier slides:
-                        <ul>
-                            <li>remember seeing the category placeholder in the configuration path</li>
-                            <li>remember seeing the "name" property in the binding JSON</li>
-                            <li>remember the @creator tag we saw earlier in the configuration JSON?</li>
-                        </ul>
-                    </li>
+                    <li>We saw some of this in action on earlier slides - remember the @type and @creator meta tags and the "name" portion of the binding?</li>
                 </ul>
             </div>
         </div>
@@ -763,7 +764,7 @@
                                 </ul>
                             </li>
                         </ul>
-                    <li>the merged configuration contains the creator that should be used.  the configuration is passed to the creator</li>
+                    <li>the merged configuration contains the creator that should be used.  the configuration is passed to the matching creator</li>
                     <li>a configured object is cached and returned to the application, which is none the wiser to the fact that configuration was remotely retrieved</li>
                 </ul>
             </div>
@@ -782,8 +783,6 @@
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;commands.add(<span class="new">new</span> BindingCommand());</code>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">//retrieve the config from ZK based on the data in the binding set</span></code>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;commands.add(<span class="new">new</span> ConfigCommand());</code>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">//create object from retrieved, merged config</span></code>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;commands.add(<span class="new">new</span> ObjectCreatorCommand());</code>
                 <br />
                 <br />
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">final</span> Chain chain = <span class="new">new</span> ChainBase(commands);</code>
@@ -794,7 +793,7 @@
             <div class="notes">
                 <ul>
                     <li>chain of responsiblity pattern</li>
-                    <li>allows for easy interjection of steps as algorithm evolves</li>
+                    <li>allows for easy interjection of steps as the algorithm evolves</li>
                     <li>result of executing the chain is the merged configuration</li>
                     <li>merged configuration is passed to object creator defined in the configuration</li>
                     <li>final result is an object created from the merged configuration</li>
@@ -802,18 +801,22 @@
             </div>
         </div>
         <div id="step38" class="step slide">
-            <h3>protecting the cookie jar</h3>
+            <h3>protect the cookie jar</h3>
             <img src="images/cookie_monster.png" style="float:right;width:50%;height:50%" />
             <div>
                 <ul>
                     <li>SASL authentication</li>
-                    <li>ACL's</li>
-                    <li>encryption</li>
+                    <li>ACL's applied to znodes</li>
+                    <li>encryption of sensitive data</li>
                 </ul>
             </div>
             <div class="notes">
                 <ul>
-                    <li>Centralizing configuration data requires being smart about what is stored in plain text in ZK</li>
+                    <li>Centralizing our configuration data requires that we be smart about who has access to what
+                        <ul>
+                            <li>Need to make sure that non-production code does not have access to production systems through configuration, etc</li>
+                        </ul>
+                    </li>
                     <li>make use of built-in authentication provider and ACL support discussed earlier
                         <ul>
                             <li>SASL auth provider used to identify type of client (application or management)</li>
@@ -832,7 +835,7 @@
             </div>
             <div class="notes">
                 <ul>
-                    <li>We did one better:  someone else configured it..you simply just connected to the service and got what you needed</li>
+                    <li>We did one better:  someone else configured it...you simply just connected to the service and got what you needed</li>
                 </ul>
             </div>
         </div>
@@ -844,7 +847,7 @@
             <div class="notes">
                 <ul>
                     <li>The configuration is no longer kept within the application.</li>
-                    <li>A simple restart will re-request the created, configured objects</li>
+                    <li>A simple restart will re-request the created, configured objects from ZK</li>
                     <li>Future expansion - use the "watch" functionality of ZooKeeper to be notified when data changes</li>
                 </ul>
             </div>
@@ -911,8 +914,7 @@
                 <ul>
                     <li>deployment data</li>
                     <li>dependency detection</li>
-                    <li>risk calculation</li>
-                    <li>outage impact</li>
+                    <li>risk calculation and outage impact</li>
                 </ul>
             </div>
             <div class="notes">
@@ -960,8 +962,8 @@
     <script>
         impressLayout().init();
         impress().init();
-       // impressConsole().init();
-       // impressConsole().open(); // If you want them to open automatically
+        //impressConsole().init();
+        //impressConsole().open(); // If you want them to open automatically
     </script>
 </body>
 
